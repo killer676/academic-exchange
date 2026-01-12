@@ -1,87 +1,73 @@
-import { signInWithPopup, signOut, User as FirebaseUser } from 'firebase/auth';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    sendEmailVerification,
+    User as FirebaseUser
+} from 'firebase/auth';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, googleProvider, db } from './firebase';
-import { isValidEduEmail } from './firebase';
+import { auth, db } from './firebase';
 import { User } from '@/types';
 
+// دالة مساعدة للتحقق من نطاق الجامعة
+const isValidEduEmail = (email: string) => {
+    const eduDomains = ['.edu.om', 'squ.edu.om', 'utas.edu.om', 'gutech.edu.om'];
+    return eduDomains.some(domain => email.endsWith(domain));
+};
+
 /**
- * Sign in with Google and verify .edu.om email
+ * 1. تسجيل حساب جديد (Sign Up)
  */
-export async function signInWithGoogle(): Promise<{ user: User | null; error: string | null }> {
-    try {
-        const result = await signInWithPopup(auth, googleProvider);
-        const firebaseUser = result.user;
-
-        // Verify email domain
-        if (!firebaseUser.email || !isValidEduEmail(firebaseUser.email)) {
-            // Sign out if email is not valid
-            await signOut(auth);
-            return {
-                user: null,
-                error: 'Please use a university email address (.edu.om) to sign in.',
-            };
-        }
-
-        // Check if user exists in Firestore
-        const userRef = doc(db, 'users', firebaseUser.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (!userSnap.exists()) {
-            // Create new user document
-            const newUser: Omit<User, 'uid'> = {
-                email: firebaseUser.email,
-                displayName: firebaseUser.displayName || 'Student',
-                photoURL: firebaseUser.photoURL,
-                phoneNumber: firebaseUser.phoneNumber || null,
-                university: '', // Will be set in profile
-                isVerifiedStudent: true,
-                createdAt: new Date(),
-            };
-
-            await setDoc(userRef, {
-                ...newUser,
-                createdAt: serverTimestamp(),
-            });
-        }
-
-        // Fetch and return user data
-        const userData = userSnap.exists() ? userSnap.data() : {
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName || 'Student',
-            photoURL: firebaseUser.photoURL,
-            phoneNumber: firebaseUser.phoneNumber || null,
-            university: '',
-            isVerifiedStudent: true,
-            createdAt: new Date(),
-        };
-
-        return {
-            user: {
-                uid: firebaseUser.uid,
-                ...userData,
-                createdAt: userData.createdAt?.toDate() || new Date(),
-            } as User,
-            error: null,
-        };
-    } catch (error: any) {
-        console.error('Error signing in with Google:', error);
-        return {
-            user: null,
-            error: error.message || 'Failed to sign in. Please try again.',
-        };
+export async function signUpWithEmail(email: string, pass: string, name: string) {
+    // 1. التحقق من النطاق
+    if (!isValidEduEmail(email)) {
+        throw new Error('Please use a valid university email (.edu.om)');
     }
-}
 
-/**
- * Sign out current user
- */
-export async function signOutUser(): Promise<void> {
+    // 2. إنشاء الحساب
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const firebaseUser = userCredential.user;
+
+    // 3. إرسال رابط التفعيل فوراً
+    await sendEmailVerification(firebaseUser);
+
+    // 4. حفظ بيانات الطالب في الداتابيس
+    const newUser = {
+        email: firebaseUser.email,
+        displayName: name,
+        isVerifiedStudent: false, // سيبقى false حتى يفعل الإيميل
+        university: 'UTAS', // قيمة افتراضية يمكن تعديلها لاحقاً
+        createdAt: serverTimestamp(),
+    };
+
+    await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+
+    // 5. تسجيل الخروج فوراً (لإجباره على التفعيل)
     await signOut(auth);
+
+    return firebaseUser;
 }
 
 /**
- * Get current user from Firebase Auth
+ * 2. تسجيل الدخول (Login) مع الحماية
  */
-export function getCurrentUser(): FirebaseUser | null {
-    return auth.currentUser;
+export async function loginWithEmail(email: string, pass: string) {
+    // 1. محاولة الدخول
+    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+    const user = userCredential.user;
+
+    // 2. الشرطي: هل الإيميل مفعل؟
+    if (!user.emailVerified) {
+        await signOut(auth); // طرد المستخدم
+        throw new Error('Email not verified! Please check your inbox.');
+    }
+
+    return user;
+}
+
+/**
+ * 3. تسجيل الخروج
+ */
+export async function signOutUser() {
+    await signOut(auth);
 }
