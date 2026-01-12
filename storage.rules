@@ -1,0 +1,42 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user has verified .edu.om email
+    function isVerifiedStudent() {
+      return request.auth != null 
+        && request.auth.token.email.matches('.*\\.edu\\.om$')
+        && request.auth.token.email_verified == true;
+    }
+    
+    // Book images - organized by user ID
+    match /book-images/{userId}/{imageId} {
+      // Only authenticated users can read images
+      allow read: if request.auth != null;
+      
+      // Only verified students can upload images to their own folder
+      allow write: if isVerifiedStudent()
+        && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024 // 5MB limit
+        && request.resource.contentType.matches('image/.*'); // Only images
+      
+      // Users can delete their own images
+      allow delete: if request.auth.uid == userId;
+    }
+    
+    // Profile pictures
+    match /profile-pictures/{userId} {
+      allow read: if request.auth != null;
+      allow write: if isVerifiedStudent()
+        && request.auth.uid == userId
+        && request.resource.size < 2 * 1024 * 1024 // 2MB limit
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth.uid == userId;
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user has verified .edu.om email
+    function isVerifiedStudent() {
+      return request.auth != null 
+        && request.auth.token.email.matches('.*\\.edu\\.om$')
+        && request.auth.token.email_verified == true;
+    }
+    
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // User profiles
+    match /users/{userId} {
+      // Anyone authenticated can read user profiles
+      allow read: if request.auth != null;
+      
+      // Users can only create/update their own profile
+      allow create: if isOwner(userId) && isVerifiedStudent();
+      allow update: if isOwner(userId) && isVerifiedStudent();
+      
+      // Only admin can delete (you'll need to add admin check)
+      allow delete: if false;
+    }
+    
+    // Book listings
+    match /books/{bookId} {
+      // Anyone authenticated can read books
+      allow read: if request.auth != null;
+      
+      // Only verified students can create listings
+      allow create: if isVerifiedStudent()
+        && request.resource.data.sellerId == request.auth.uid
+        && request.resource.data.price >= 0
+        && request.resource.data.price <= 10000
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.description.size() <= 2000;
+      
+      // Only the seller can update their listing
+      allow update: if isVerifiedStudent()
+        && isOwner(resource.data.sellerId)
+        && request.resource.data.sellerId == resource.data.sellerId; // Prevent seller change
+      
+      // Only the seller can delete their listing
+      allow delete: if isOwner(resource.data.sellerId);
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
