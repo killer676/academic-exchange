@@ -2,7 +2,7 @@
 export const en = {
     // Common
     common: {
-        appName: 'EduShare',
+        appName: 'UTAShare',
         tagline: 'Share & Learn Together in Oman',
         currency: 'OMR',
         loading: 'Loading...',
@@ -36,8 +36,8 @@ export const en = {
 
     // Home Page
     home: {
-        heroTitle: 'Your Gateway to',
-        heroTitleHighlight: 'Learning Success in Oman',
+        heroTitle: 'Welcome to',
+        heroTitleHighlight: 'UTAShare',
         heroSubtitle: 'Find summaries, past exams, and notes shared by students from UTAS, SQU, and more.',
         searchPlaceholder: 'Search for resources (e.g. MATH1200)...',
         browseBtn: 'Share a Resource',
@@ -45,7 +45,7 @@ export const en = {
         recentUploads: 'Recent Uploads',
         features: {
             title: 'Why Choose Us',
-            titleHighlight: 'EduShare',
+            titleHighlight: 'UTAShare',
             subtitle: 'Everything you need to succeed in your studies',
             direct: {
                 title: 'Direct Uploads',
@@ -162,7 +162,7 @@ export const en = {
     // Auth Pages
     auth: {
         signUp: {
-            title: 'Create Account',
+            title: 'Join UTAShare',
             subtitle: 'Join with your university email',
             emailLabel: 'University Email',
             emailPlaceholder: 'student@squ.edu.om',
@@ -192,7 +192,7 @@ export const en = {
             },
         },
         signIn: {
-            title: 'Welcome Back',
+            title: 'Sign in to UTAShare',
             subtitle: 'Sign in to your account',
             emailLabel: 'University Email',
             emailPlaceholder: 'student@squ.edu.om',
@@ -234,7 +234,7 @@ export const en = {
     // WhatsApp Messages
     whatsapp: {
         buyMessage: "Hi! I'm interested in buying",
-        fromPlatform: 'from EduShare.',
+        fromPlatform: 'from UTAShare.',
     },
 
     // Footer
@@ -245,7 +245,7 @@ export const en = {
         legal: 'Legal',
         privacy: 'Privacy Policy',
         terms: 'Terms of Service',
-        copyright: '© 2024 EduShare. All rights reserved.',
+        copyright: '© 2024 UTAShare. All rights reserved.',
         madeWith: 'Made with',
         forStudents: 'for Omani students',
     },
@@ -264,7 +264,7 @@ export const en = {
 export const ar = {
     // Common
     common: {
-        appName: 'إيدو شير',
+        appName: 'UTAShare',
         tagline: 'شارك وتعلم معاً في عُمان',
         currency: 'ر.ع.',
         loading: 'جاري التحميل...',
@@ -298,8 +298,8 @@ export const ar = {
 
     // Home Page
     home: {
-        heroTitle: 'بوابتك إلى',
-        heroTitleHighlight: 'التميز الأكاديمي في عُمان',
+        heroTitle: 'أهلاً بك في',
+        heroTitleHighlight: 'UTAShare',
         heroSubtitle: 'اعثر على ملخصات، امتحانات سابقة، وملاحظات مشاركة من طلاب UTAS، SQU، والمزيد.',
         searchPlaceholder: 'ابحث عن موارد (مثل MATH1200)...',
         browseBtn: 'شارك مورداً',
@@ -307,7 +307,7 @@ export const ar = {
         recentUploads: 'أحدث الإضافات',
         features: {
             title: 'لماذا تختارنا',
-            titleHighlight: 'إيدو شير',
+            titleHighlight: 'UTAShare',
             subtitle: 'كل ما تحتاجه للنجاح في دراستك',
             direct: {
                 title: 'رفع مباشر',
@@ -424,7 +424,7 @@ export const ar = {
     // Auth Pages
     auth: {
         signUp: {
-            title: 'إنشاء حساب',
+            title: 'انضم إلى UTAShare',
             subtitle: 'انضم ببريدك الجامعي',
             emailLabel: 'البريد الجامعي',
             emailPlaceholder: 'student@squ.edu.om',
@@ -454,7 +454,7 @@ export const ar = {
             },
         },
         signIn: {
-            title: 'مرحباً بعودتك',
+            title: 'تسجيل الدخول إلى UTAShare',
             subtitle: 'سجل دخولك لحسابك',
             emailLabel: 'البريد الجامعي',
             emailPlaceholder: 'student@squ.edu.om',
@@ -496,7 +496,7 @@ export const ar = {
     // WhatsApp Messages
     whatsapp: {
         buyMessage: 'مرحباً! أرغب في شراء',
-        fromPlatform: 'من إيدو شير.',
+        fromPlatform: 'من UTAShare.',
     },
 
     // Footer
@@ -507,7 +507,7 @@ export const ar = {
         legal: 'قانوني',
         privacy: 'سياسة الخصوصية',
         terms: 'شروط الخدمة',
-        copyright: '© 2024 إيدو شير. جميع الحقوق محفوظة.',
+        copyright: '© 2024 UTAShare. جميع الحقوق محفوظة.',
         madeWith: 'صُنع بـ',
         forStudents: 'للطلاب العمانيين',
     },

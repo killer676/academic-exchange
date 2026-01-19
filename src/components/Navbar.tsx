@@ -67,7 +67,7 @@ export default function Navbar() {
                             </svg>
                         </div>
                         <span className="text-xl font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                            Edu<span className="text-blue-600 dark:text-blue-400">Share</span>
+                            UTA<span className="text-blue-600 dark:text-blue-400">Share</span>
                         </span>
                     </Link>
 

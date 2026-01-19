@@ -33,7 +33,7 @@ export default function Footer() {
                                 {isRTL ? (
                                     <>{t('common.appName')}</>
                                 ) : (
-                                    <><>Edu<span className="text-blue-600 dark:text-blue-400">Share</span></></>
+                                    <><>UTA<span className="text-blue-600 dark:text-blue-400">Share</span></></>
                                 )}
                             </span>
                         </Link>

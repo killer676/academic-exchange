@@ -13,13 +13,13 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-    title: "EduShare | Share Study Resources in Oman",
-    description: "The trusted platform for Omani university students to share and discover study resources. Summaries, notes, past exams, and projects from verified students.",
-    keywords: ["resources", "Oman", "university", "students", "study", "summaries", "notes", "exams", "education", "learning", "EduShare"],
-    authors: [{ name: "EduShare" }],
+    title: "UTAShare | Student Academic Exchange",
+    description: "The dedicated platform for UTAS students to share and discover study resources. Summaries, notes, past exams, and projects from verified students.",
+    keywords: ["resources", "UTAS", "university", "students", "study", "summaries", "notes", "exams", "education", "learning", "UTAShare"],
+    authors: [{ name: "UTAShare" }],
     openGraph: {
-        title: "EduShare | Share Study Resources in Oman",
-        description: "The trusted platform for Omani university students to share and discover study resources.",
+        title: "UTAShare | Student Academic Exchange",
+        description: "The dedicated platform for UTAS students to share and discover study resources.",
         type: "website",
     },
 };
