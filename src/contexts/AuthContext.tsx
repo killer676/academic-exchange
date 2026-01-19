@@ -9,6 +9,7 @@ import {
     signInWithEmailAndPassword,
     signOut as firebaseSignOut,
     sendEmailVerification,
+    sendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, isValidEduEmail } from '@/lib/firebase';
@@ -21,6 +22,7 @@ interface AuthContextType {
     signUp: (email: string, password: string) => Promise<void>;
     signIn: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,6 +32,7 @@ const AuthContext = createContext<AuthContextType>({
     signUp: async () => { },
     signIn: async () => { },
     signOut: async () => { },
+    resetPassword: async () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -132,6 +135,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const resetPassword = async (email: string) => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+        } catch (error) {
+            throw error;
+        }
+    };
+
     // Session security callbacks
     const handleSessionTimeout = useCallback(async () => {
         console.log('[Security] User logged out due to inactivity');
@@ -160,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return (
-        <AuthContext.Provider value={{ user, firebaseUser, loading, signUp, signIn, signOut }}>
+        <AuthContext.Provider value={{ user, firebaseUser, loading, signUp, signIn, signOut, resetPassword }}>
             {children}
         </AuthContext.Provider>
     );
