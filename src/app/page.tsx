@@ -1,271 +1,263 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useRouter } from 'next/navigation';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { Resource } from '@/types';
+import { UNIVERSITIES } from '@/lib/constants';
 
 export default function Home() {
+    const { t, isRTL } = useLanguage();
+    const router = useRouter();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [recentResources, setRecentResources] = useState<Resource[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchRecentResources();
+    }, []);
+
+    const fetchRecentResources = async () => {
+        try {
+            const q = query(
+                collection(db, 'resources'),
+                orderBy('createdAt', 'desc'),
+                limit(3)
+            );
+            const snapshot = await getDocs(q);
+            const resources = snapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...data,
+                    // Handle Firestore Timestamp or standard Date
+                    createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt || Date.now())
+                };
+            }) as Resource[];
+            setRecentResources(resources);
+        } catch (error) {
+            console.error('Error fetching recent resources:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/browse?search=${encodeURIComponent(searchQuery)}`);
+        }
+    };
+
+    const getUniversityName = (id: string) => {
+        const uni = UNIVERSITIES.find(u => u.id === id);
+        return uni?.name || id;
+    };
+
     return (
-        <main className="min-h-screen gradient-bg text-white overflow-hidden">
+        <main className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
             <Navbar />
 
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center justify-center pt-20">
-                {/* Animated background elements */}
-                <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float" />
-                    <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-                    <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+            <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+                {/* Subtle Background Pattern */}
+                <div className="absolute inset-0 -z-10 opacity-30 dark:opacity-20">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100/50 dark:bg-blue-900/20 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-100/50 dark:bg-indigo-900/20 rounded-full blur-3xl text-slate-600" />
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMTUsIDIzLCA0MiwgMC4wNSkiLz48L3N2Zz4=')] opacity-50 dark:opacity-20" />
                 </div>
 
-                {/* Grid pattern overlay */}
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSA2MCAwIEwgMCAwIDAgNjAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50" />
-
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl mb-8">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                        <span className="text-sm text-gray-300">Exclusively for Omani Students</span>
-                    </div>
-
-                    {/* Main heading */}
-                    <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-8">
-                        <span className="block">Buy & Sell</span>
-                        <span className="gradient-text">University Textbooks</span>
-                        <span className="block mt-2">in Oman</span>
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight">
+                        <span className="block mb-2">{t('home.heroTitle')}</span>
+                        <span className="gradient-text">{t('home.heroTitleHighlight')}</span>
                     </h1>
 
-                    {/* Subheading */}
-                    <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-12 leading-relaxed">
-                        The trusted marketplace connecting verified Omani university students.
-                        Save up to 70% on textbooks and help fellow students succeed.
+                    <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+                        {t('home.heroSubtitle')}
                     </p>
 
-                    {/* CTA buttons */}
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                        <Link href="/browse" className="btn-primary text-lg px-10 py-4 w-full sm:w-auto">
-                            Browse Books
+                    {/* Search Input */}
+                    <div className="max-w-2xl mx-auto mb-10">
+                        <form onSubmit={handleSearch} className="relative group">
+                            <div className="relative flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl p-2 transition-all focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md">
+                                <svg className={`w-5 h-5 text-slate-400 ml-4 ${isRTL ? 'order-last mr-4 ml-0' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder={t('home.searchPlaceholder')}
+                                    className={`w-full bg-transparent border-none text-slate-900 dark:text-white placeholder-slate-400 focus:ring-0 px-4 py-3 text-base ${isRTL ? 'text-right' : ''}`}
+                                />
+                                <button
+                                    type="submit"
+                                    className="hidden sm:block px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-sm"
+                                >
+                                    Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className={`flex flex-col sm:flex-row items-center justify-center gap-4 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+                        <Link href="/share" className="btn-primary w-full sm:w-auto text-lg px-8 py-3">
+                            {t('home.browseBtn')}
                         </Link>
                         <Link
-                            href="/signup"
-                            className="group flex items-center gap-2 px-8 py-4 rounded-full border border-white/20 hover:border-purple-400/50 hover:bg-white/5 transition-all duration-300 w-full sm:w-auto justify-center"
+                            href="/requests"
+                            className="btn-secondary w-full sm:w-auto text-lg px-8 py-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                         >
-                            <span>Start Selling</span>
-                            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            {t('home.requestsBtn')}
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* Recent Uploads Section */}
+            <section className="py-16 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 transition-colors">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className={`text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                            <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
+                            {t('home.recentUploads')}
+                        </h3>
+                        <Link href="/browse" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium flex items-center gap-1">
+                            View all
+                            <svg className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                         </Link>
                     </div>
 
-                    {/* Stats */}
-                    <div className="flex flex-wrap justify-center gap-8 lg:gap-16">
-                        {[
-                            { value: '1000+', label: 'Active Listings' },
-                            { value: '5000+', label: 'Students Registered' },
-                            { value: '70%', label: 'Average Savings' },
-                        ].map((stat, idx) => (
-                            <div key={idx} className="text-center">
-                                <div className="text-3xl lg:text-4xl font-bold gradient-text">{stat.value}</div>
-                                <div className="text-gray-400 mt-1">{stat.label}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {loading ? (
+                            [1, 2, 3].map((i) => (
+                                <div key={i} className="h-32 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse"></div>
+                            ))
+                        ) : recentResources.length > 0 ? (
+                            recentResources.map((resource) => (
+                                <Link
+                                    href={`/resources/${resource.id}`}
+                                    key={resource.id}
+                                    className="feature-card group block hover:-translate-y-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl transition-all"
+                                >
+                                    <div className={`flex flex-col h-full ${isRTL ? 'items-end text-right' : ''}`}>
+                                        <div className="flex items-center gap-2 mb-3 w-full">
+                                            <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800 truncate">
+                                                {resource.courseCode}
+                                            </span>
+                                            <span className="text-xs text-slate-500 dark:text-slate-400 truncate flex-1 text-right">
+                                                {getUniversityName(resource.university)}
+                                            </span>
+                                        </div>
+                                        <h4 className="font-bold text-slate-800 dark:text-white mb-2 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                            {resource.title}
+                                        </h4>
+                                        <div className="mt-auto pt-3 border-t border-slate-200 dark:border-slate-700 w-full flex items-center justify-between text-xs text-slate-400">
+                                            <span>{resource.createdAt.toLocaleDateString()}</span>
+                                            <span className="flex items-center gap-1">
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))
+                        ) : (
+                            <div className="col-span-3 text-center py-12 text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                                No resources uploaded yet. Be the first!
                             </div>
-                        ))}
+                        )}
                     </div>
-                </div>
-
-                {/* Scroll indicator */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
                 </div>
             </section>
 
-            {/* Features Section */}
-            <section id="features" className="relative py-32">
+            {/* Features Grid */}
+            <section className="py-24 bg-slate-50 dark:bg-slate-950 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Section header */}
-                    <div className="text-center mb-20">
-                        <span className="text-purple-400 font-semibold tracking-wider uppercase text-sm">Why Choose Us</span>
-                        <h2 className="text-4xl lg:text-5xl font-bold mt-4 mb-6">
-                            Built for <span className="gradient-text">Omani Students</span>
+                    <div className="text-center mb-16 max-w-3xl mx-auto">
+                        <span className="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase text-xs mb-2 block">
+                            {t('home.features.title')}
+                        </span>
+                        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 dark:text-white">
+                            {isRTL ? 'مصمم لـ' : 'Designed for '} <span className="gradient-text">{t('home.features.titleHighlight')}</span>
                         </h2>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            A secure, student-only platform designed specifically for university communities across Oman.
+                        <p className="text-slate-600 dark:text-slate-400 text-lg">
+                            {t('home.features.subtitle')}
                         </p>
                     </div>
 
-                    {/* Feature cards */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* Feature 1 */}
-                        <div className="feature-card group">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    <div className={`grid md:grid-cols-3 gap-8 ${isRTL ? 'rtl-grid' : ''}`}>
+                        {/* Direct Uploads */}
+                        <div className="feature-card text-center p-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm rounded-3xl transition-all hover:shadow-lg dark:shadow-slate-900/50">
+                            <div className="w-14 h-14 mx-auto rounded-xl bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">Verified Students Only</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                We verify all users with .edu.om email addresses to ensure a safe,
-                                trusted community of real Omani university students.
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t('home.features.direct.title')}</h3>
+                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                                {t('home.features.direct.description')}
                             </p>
                         </div>
 
-                        {/* Feature 2 */}
-                        <div className="feature-card group">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {/* Request Board */}
+                        <div className="feature-card text-center p-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm rounded-3xl transition-all hover:shadow-lg dark:shadow-slate-900/50">
+                            <div className="w-14 h-14 mx-auto rounded-xl bg-indigo-100 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t('home.features.requests.title')}</h3>
+                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                                {t('home.features.requests.description')}
+                            </p>
+                        </div>
+
+                        {/* Free Forever */}
+                        <div className="feature-card text-center p-8 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm rounded-3xl transition-all hover:shadow-lg dark:shadow-slate-900/50">
+                            <div className="w-14 h-14 mx-auto rounded-xl bg-teal-100 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">Save Up to 70%</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Buy used textbooks at a fraction of the retail price. Sell your
-                                old books and earn money back on your investment.
-                            </p>
-                        </div>
-
-                        {/* Feature 3 */}
-                        <div className="feature-card group">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-6 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">WhatsApp Chat</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Connect directly with sellers via WhatsApp for quick, convenient
-                                communication and hassle-free transactions.
-                            </p>
-                        </div>
-
-                        {/* Feature 4 */}
-                        <div className="feature-card group">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">Smart Filters</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Find exactly what you need with filters for university, major,
-                                condition, and price. Search smarter, not harder.
-                            </p>
-                        </div>
-
-                        {/* Feature 5 */}
-                        <div className="feature-card group">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center mb-6 shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">Photo Listings</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Upload photos of your books so buyers can see the actual condition.
-                                No surprises, just honest transactions.
-                            </p>
-                        </div>
-
-                        {/* Feature 6 */}
-                        <div className="feature-card group">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition-transform duration-300">
-                                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 text-white">All Universities</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                From SQU to GUtech, Nizwa to Dhofar – we support students from
-                                all major universities across Oman.
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t('home.features.free.title')}</h3>
+                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                                {t('home.features.free.description')}
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* How It Works Section */}
-            <section id="how-it-works" className="relative py-32 bg-slate-900/50">
+            {/* How It Works (Simplified) */}
+            <section className="py-24 bg-white dark:bg-slate-900 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Section header */}
-                    <div className="text-center mb-20">
-                        <span className="text-purple-400 font-semibold tracking-wider uppercase text-sm">Simple Process</span>
-                        <h2 className="text-4xl lg:text-5xl font-bold mt-4 mb-6">
-                            How It <span className="gradient-text">Works</span>
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
+                            {t('home.howItWorks.title')} <span className="gradient-text">{t('home.howItWorks.titleHighlight')}</span>
                         </h2>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                            Get started in minutes. Whether you&apos;re buying or selling, we&apos;ve made the process seamless.
-                        </p>
                     </div>
 
-                    {/* Steps */}
-                    <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-                        {/* Step 1 */}
-                        <div className="relative text-center group">
-                            <div className="relative inline-flex mb-8">
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-bold shadow-xl shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300">
-                                    1
+                    <div className={`grid md:grid-cols-3 gap-8 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+                        {[1, 2, 3].map((step) => (
+                            <div key={step} className="p-6 text-center relative">
+                                <div className="w-12 h-12 mx-auto bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold text-white mb-6 shadow-lg shadow-blue-600/20">
+                                    {step}
                                 </div>
-                                {/* Connector line */}
-                                <div className="hidden md:block absolute top-1/2 left-full w-full h-0.5 bg-gradient-to-r from-purple-500 to-transparent" />
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{t(`home.howItWorks.step${step}.title`)}</h3>
+                                <p className="text-slate-600 dark:text-slate-400">{t(`home.howItWorks.step${step}.description`)}</p>
                             </div>
-                            <h3 className="text-xl font-bold mb-4 text-white">Sign Up with Google</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Create your account using your university email (.edu.om) to join our verified student community.
-                            </p>
-                        </div>
-
-                        {/* Step 2 */}
-                        <div className="relative text-center group">
-                            <div className="relative inline-flex mb-8">
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-3xl font-bold shadow-xl shadow-pink-500/30 group-hover:scale-110 transition-transform duration-300">
-                                    2
-                                </div>
-                                {/* Connector line */}
-                                <div className="hidden md:block absolute top-1/2 left-full w-full h-0.5 bg-gradient-to-r from-pink-500 to-transparent" />
-                            </div>
-                            <h3 className="text-xl font-bold mb-4 text-white">Browse or List</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Search for textbooks by university and major, or list your own books with photos and descriptions.
-                            </p>
-                        </div>
-
-                        {/* Step 3 */}
-                        <div className="relative text-center group">
-                            <div className="inline-flex mb-8">
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-3xl font-bold shadow-xl shadow-orange-500/30 group-hover:scale-110 transition-transform duration-300">
-                                    3
-                                </div>
-                            </div>
-                            <h3 className="text-xl font-bold mb-4 text-white">Connect & Exchange</h3>
-                            <p className="text-gray-400 leading-relaxed">
-                                Contact sellers directly via WhatsApp, meet up on campus, and complete your exchange safely.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="relative py-32">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-96 h-96 bg-purple-500/20 rounded-full blur-3xl" />
-                    </div>
-
-                    <div className="relative">
-                        <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-                            Ready to <span className="gradient-text">Save on Textbooks?</span>
-                        </h2>
-                        <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
-                            Join thousands of Omani students who are already saving money and helping each other succeed academically.
-                        </p>
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <Link href="/signup" className="btn-primary text-lg px-12 py-4 animate-pulse-glow">
-                                Get Started Free
-                            </Link>
-                            <Link href="/browse" className="text-gray-300 hover:text-white transition-colors font-medium">
-                                Or browse listings first →
-                            </Link>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>

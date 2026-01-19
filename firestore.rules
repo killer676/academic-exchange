@@ -21,33 +21,69 @@ service cloud.firestore {
       
       // Users can only create/update their own profile
       allow create: if isOwner(userId) && isVerifiedStudent();
-      allow update: if isOwner(userId) && isVerifiedStudent();
+      allow update: if isOwner(userId);
       
-      // Only admin can delete (you'll need to add admin check)
+      // No deletes allowed
       allow delete: if false;
     }
     
-    // Book listings
-    match /books/{bookId} {
-      // Anyone authenticated can read books
+    // 🔒 RESOURCES (your actual collection)
+    match /resources/{resourceId} {
+      // Anyone authenticated can read resources
       allow read: if request.auth != null;
       
-      // Only verified students can create listings
+      // Only verified students can create resources
       allow create: if isVerifiedStudent()
-        && request.resource.data.sellerId == request.auth.uid
-        && request.resource.data.price >= 0
-        && request.resource.data.price <= 10000
+        && request.resource.data.authorId == request.auth.uid
         && request.resource.data.title.size() > 0
         && request.resource.data.title.size() <= 200
-        && request.resource.data.description.size() <= 2000;
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.courseCode.size() <= 20
+        && request.resource.data.type in ['summary', 'past-exam', 'notes', 'project'];
       
-      // Only the seller can update their listing
+      // Only the author can update their resource
       allow update: if isVerifiedStudent()
-        && isOwner(resource.data.sellerId)
-        && request.resource.data.sellerId == resource.data.sellerId; // Prevent seller change
+        && isOwner(resource.data.authorId)
+        && request.resource.data.authorId == resource.data.authorId; // Prevent author change
       
-      // Only the seller can delete their listing
-      allow delete: if isOwner(resource.data.sellerId);
+      // Only the author can delete their resource
+      allow delete: if isOwner(resource.data.authorId);
+      
+      // 🔒 COMMENTS subcollection
+      match /comments/{commentId} {
+        // Anyone authenticated can read comments
+        allow read: if request.auth != null;
+        
+        // Only verified students can create comments
+        allow create: if isVerifiedStudent()
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 1000;
+        
+        // Only comment author can update/delete
+        allow update, delete: if isOwner(resource.data.userId);
+      }
+    }
+    
+    // 🔒 REQUESTS collection
+    match /requests/{requestId} {
+      // Anyone authenticated can read requests
+      allow read: if request.auth != null;
+      
+      // Only verified students can create requests
+      allow create: if isVerifiedStudent()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.courseCode.size() > 0
+        && request.resource.data.courseCode.size() <= 20
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 1000;
+      
+      // Author can update their request
+      allow update: if isOwner(resource.data.authorId)
+        && request.resource.data.authorId == resource.data.authorId;
+      
+      // Author can delete their request
+      allow delete: if isOwner(resource.data.authorId);
     }
     
     // Deny all other access

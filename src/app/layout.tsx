@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cairo } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
-const inter = Inter({
-    subsets: ["latin"],
-    variable: "--font-inter",
+import { Providers } from "@/components/Providers";
+
+const cairo = Cairo({
+    subsets: ["arabic", "latin"],
+    weight: ["400", "600", "700"],
+    variable: "--font-cairo",
 });
 
 export const metadata: Metadata = {
-    title: "Academic Exchange | Buy & Sell Textbooks in Oman",
-    description: "The trusted marketplace for Omani university students to buy and sell used textbooks. Verified students only with .edu.om email addresses.",
-    keywords: ["textbooks", "Oman", "university", "students", "buy", "sell", "academic", "books"],
-    authors: [{ name: "Academic Exchange" }],
+    title: "EduShare | Share Study Resources in Oman",
+    description: "The trusted platform for Omani university students to share and discover study resources. Summaries, notes, past exams, and projects from verified students.",
+    keywords: ["resources", "Oman", "university", "students", "study", "summaries", "notes", "exams", "education", "learning", "EduShare"],
+    authors: [{ name: "EduShare" }],
     openGraph: {
-        title: "Academic Exchange | Buy & Sell Textbooks in Oman",
-        description: "The trusted marketplace for Omani university students to buy and sell used textbooks.",
+        title: "EduShare | Share Study Resources in Oman",
+        description: "The trusted platform for Omani university students to share and discover study resources.",
         type: "website",
     },
 };
@@ -26,11 +30,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className="scroll-smooth">
-            <body className={`${inter.variable} antialiased`}>
-                <AuthProvider>
-                    {children}
-                </AuthProvider>
+        <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+            <body className={`${cairo.variable} font-sans antialiased`}>
+                <Providers>
+                    <LanguageProvider>
+                        <AuthProvider>
+                            {children}
+                        </AuthProvider>
+                    </LanguageProvider>
+                </Providers>
             </body>
         </html>
     );

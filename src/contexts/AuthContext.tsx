@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { useSessionSecurity } from '@/hooks/useSessionSecurity';
 import {
     User as FirebaseUser,
     onAuthStateChanged,
@@ -42,12 +43,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             setFirebaseUser(firebaseUser);
 
-            if (firebaseUser && firebaseUser.emailVerified) {
+            if (firebaseUser /* FAMILY TESTING MODE: Disabled emailVerified check */ /* && firebaseUser.emailVerified */) {
                 // Fetch user data from Firestore
                 const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
 
                 if (userDoc.exists()) {
-                    setUser(userDoc.data() as User);
+                    const userData = userDoc.data();
+                    // Convert Firestore Timestamp to Date if needed
+                    const user: User = {
+                        ...userData,
+                        createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : (userData.createdAt || new Date()),
+                    } as User;
+                    setUser(user);
                 } else {
                     // Create initial user document
                     const newUser: User = {
@@ -76,19 +83,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signUp = async (email: string, password: string) => {
         try {
-            // Validate university email
-            if (!isValidEduEmail(email)) {
-                throw new Error('Please use your university email');
-            }
+            // FAMILY TESTING MODE: Disabled university email validation
+            // if (!isValidEduEmail(email)) {
+            //     throw new Error('Please use your university email');
+            // }
 
             // Create account
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            // Send verification email
-            await sendEmailVerification(userCredential.user);
+            // FAMILY TESTING MODE: Skip email verification
+            // await sendEmailVerification(userCredential.user);
 
-            // Sign out immediately - they must verify first
-            await firebaseSignOut(auth);
+            // FAMILY TESTING MODE: Don't sign out - let them in immediately
+            // await firebaseSignOut(auth);
         } catch (error: any) {
             console.error('Sign up error:', error);
             throw error;
@@ -102,16 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Reload user to get the latest emailVerified status
             await userCredential.user.reload();
 
-            // Check if email is verified (use auth.currentUser to get refreshed state)
-            const currentUser = auth.currentUser;
+            // FAMILY TESTING MODE: Disabled email verification check
+            // const currentUser = auth.currentUser;
+            // if (!currentUser || !currentUser.emailVerified) {
+            //     await firebaseSignOut(auth);
+            //     throw new Error('Please verify your email first by clicking the link sent to your inbox.');
+            // }
 
-            if (!currentUser || !currentUser.emailVerified) {
-                // Immediately sign out unverified users
-                await firebaseSignOut(auth);
-                throw new Error('Please verify your email first by clicking the link sent to your inbox.');
-            }
-
-            // If we reach here, user is verified and can proceed
+            // If we reach here, user can proceed
         } catch (error: any) {
             console.error('Sign in error:', error);
             throw error;
@@ -127,9 +132,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // Session security callbacks
+    const handleSessionTimeout = useCallback(async () => {
+        console.log('[Security] User logged out due to inactivity');
+        try {
+            await firebaseSignOut(auth);
+        } catch (error) {
+            console.error('Session timeout sign out error:', error);
+        }
+    }, []);
+
+    const handlePageClose = useCallback(async () => {
+        console.log('[Security] User logged out due to page close');
+        try {
+            // Use synchronous signOut for beforeunload event
+            firebaseSignOut(auth);
+        } catch (error) {
+            console.error('Page close sign out error:', error);
+        }
+    }, []);
+
+    // Enable session security when user is logged in
+    useSessionSecurity({
+        onTimeout: handleSessionTimeout,
+        onPageClose: handlePageClose,
+        enabled: !!user && !loading,
+    });
+
     return (
         <AuthContext.Provider value={{ user, firebaseUser, loading, signUp, signIn, signOut }}>
             {children}
         </AuthContext.Provider>
     );
 }
+

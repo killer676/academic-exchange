@@ -1,60 +1,75 @@
-// Omani Universities
+// Oman Country Code
+export const OMAN_COUNTRY_CODE = '968';
+
+// Resource Types with colors for badges
+export const RESOURCE_TYPES = [
+    { id: 'summary', name: 'Summary', nameAr: 'ملخص', color: 'bg-blue-500' },
+    { id: 'past-exam', name: 'Past Exam', nameAr: 'امتحان سابق', color: 'bg-red-500' },
+    { id: 'notes', name: 'Notes', nameAr: 'ملاحظات', color: 'bg-green-500' },
+    { id: 'project', name: 'Project', nameAr: 'مشروع', color: 'bg-purple-500' },
+];
+
+// Universities in Oman
 export const UNIVERSITIES = [
-    { id: 'squ', name: 'Sultan Qaboos University' },
-    { id: 'gutech', name: 'German University of Technology in Oman (GUtech)' },
-    { id: 'uob', name: 'University of Buraimi' },
-    { id: 'du', name: 'Dhofar University' },
-    { id: 'nu', name: 'Nizwa University' },
-    { id: 'su', name: 'Sohar University' },
-    { id: 'mu', name: 'Middle East College' },
-    { id: 'ccq', name: 'Caledonian College of Engineering' },
-    { id: 'gcet', name: 'Gulf College' },
-    { id: 'mct', name: 'Modern College of Business and Science' },
-    { id: 'ou', name: 'Oman Medical College' },
-    { id: 'other', name: 'Other' },
-] as const;
+    { id: 'squ', name: 'Sultan Qaboos University', domain: 'squ.edu.om' },
+    { id: 'gutech', name: 'German University of Technology', domain: 'gutech.edu.om' },
+    { id: 'utas', name: 'University of Technology and Applied Sciences', domain: 'utas.edu.om' },
+    { id: 'unizwa', name: 'University of Nizwa', domain: 'unizwa.edu.om' },
+    { id: 'du', name: 'Dhofar University', domain: 'du.edu.om' },
+    { id: 'su', name: 'Sohar University', domain: 'su.edu.om' },
+    { id: 'aou', name: 'Arab Open University', domain: 'aou.edu.om' },
+    { id: 'mec', name: 'Middle East College', domain: 'mec.edu.om' },
+    { id: 'mcbs', name: 'Modern College of Business and Science', domain: 'mcbs.edu.om' },
+    { id: 'gcc', name: 'Gulf College', domain: 'gulfcollege.edu.om' },
+    { id: 'ou', name: 'Oman College of Management & Technology', domain: 'ocmt.edu.om' },
+    { id: 'buc', name: 'Bayan College', domain: 'bayancollege.edu.om' },
+    { id: 'mu', name: 'Muscat University', domain: 'muscatuniversity.edu.om' },
+    { id: 'nct', name: 'National College of Technology', domain: 'nct.edu.om' },
+];
 
-// Book Conditions
-export const BOOK_CONDITIONS = [
-    { id: 'new', name: 'New', description: 'Brand new, never used' },
-    { id: 'like-new', name: 'Like New', description: 'Minimal wear, looks new' },
-    { id: 'good', name: 'Good', description: 'Some wear but fully functional' },
-    { id: 'fair', name: 'Fair', description: 'Noticeable wear, still usable' },
-    { id: 'poor', name: 'Poor', description: 'Heavy wear, may have markings' },
-] as const;
-
-// Common Majors
+// Majors/Departments
 export const MAJORS = [
     'Computer Science',
+    'Information Technology',
     'Engineering',
     'Business Administration',
     'Medicine',
-    'Law',
-    'Architecture',
-    'Education',
-    'Arts & Humanities',
-    'Natural Sciences',
-    'Mathematics',
-    'Economics',
-    'Psychology',
     'Pharmacy',
+    'Law',
+    'Arts & Humanities',
+    'Education',
+    'Economics',
+    'Accounting',
+    'Marketing',
+    'Civil Engineering',
+    'Mechanical Engineering',
+    'Electrical Engineering',
+    'Architecture',
+    'Mathematics',
+    'Physics',
+    'Chemistry',
+    'Biology',
+    'Environmental Science',
+    'Psychology',
+    'Sociology',
+    'Media & Communications',
     'Nursing',
+    'Dentistry',
     'Other',
-] as const;
+];
 
-// Price range for filters (in OMR)
-export const PRICE_RANGES = [
-    { id: 'any', label: 'Any Price', min: 0, max: Infinity },
-    { id: '0-5', label: '0 - 5 OMR', min: 0, max: 5 },
-    { id: '5-10', label: '5 - 10 OMR', min: 5, max: 10 },
-    { id: '10-20', label: '10 - 20 OMR', min: 10, max: 20 },
-    { id: '20-50', label: '20 - 50 OMR', min: 20, max: 50 },
-    { id: '50+', label: '50+ OMR', min: 50, max: Infinity },
-] as const;
+// Library categories for Open Library integration
+export const LIBRARY_CATEGORIES = [
+    { id: 'textbooks', name: 'Textbooks', nameAr: 'كتب دراسية', query: 'textbook free' },
+    { id: 'science', name: 'Science', nameAr: 'علوم', query: 'science textbook free' },
+    { id: 'mathematics', name: 'Mathematics', nameAr: 'رياضيات', query: 'mathematics textbook free' },
+    { id: 'engineering', name: 'Engineering', nameAr: 'هندسة', query: 'engineering textbook free' },
+    { id: 'business', name: 'Business', nameAr: 'إدارة أعمال', query: 'business textbook free' },
+    { id: 'computer', name: 'Computer Science', nameAr: 'علوم الحاسوب', query: 'computer science textbook free' },
+    { id: 'medicine', name: 'Medicine', nameAr: 'طب', query: 'medicine textbook free' },
+    { id: 'literature', name: 'Literature', nameAr: 'أدب', query: 'literature textbook free' },
+];
 
-// App metadata
-export const APP_CONFIG = {
-    name: 'Academic Exchange',
-    tagline: 'Buy & Sell Textbooks in Oman',
-    description: 'The trusted marketplace for Omani university students to buy and sell used textbooks.',
-};
+// Session Security Settings
+export const SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes in milliseconds
+export const SESSION_WARNING_MS = 2 * 60 * 1000; // Warning 2 minutes before timeout (optional future use)
