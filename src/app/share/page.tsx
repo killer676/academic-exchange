@@ -26,7 +26,7 @@ function ShareContent() {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        university: searchParams.get('university') || '',
+        university: 'utas', // Hardcoded for UTAS pivot
         courseCode: searchParams.get('courseCode') || '',
         type: '',
         link: '',
@@ -188,7 +188,8 @@ function ShareContent() {
 
                         {/* University and Course Code */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
+                            {/* University Selection - Removed for single uni pivot */}
+                            {/* <div>
                                 <label htmlFor="university" className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">
                                     {isRTL ? 'الجامعة' : 'University'} <span className="text-red-500 dark:text-red-400">*</span>
                                 </label>
@@ -196,26 +197,12 @@ function ShareContent() {
                                     id="university"
                                     value={formData.university}
                                     onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                                    className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 appearance-none cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                                    style={{
-                                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                                        backgroundPosition: 'right 0.5rem center',
-                                        backgroundRepeat: 'no-repeat',
-                                        backgroundSize: '1.5em 1.5em',
-                                        paddingRight: '2.5rem'
-                                    }}
+                                    className="hidden"
                                     required
                                 >
-                                    <option value="" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                        {isRTL ? 'اختر الجامعة' : 'Select university'}
-                                    </option>
-                                    {UNIVERSITIES.map((uni) => (
-                                        <option key={uni.id} value={uni.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                                            {uni.name}
-                                        </option>
-                                    ))}
+                                    <option value="utas">UTAS</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                             <div>
                                 <label htmlFor="courseCode" className="block text-sm font-semibold text-slate-700 dark:text-gray-300 mb-2">

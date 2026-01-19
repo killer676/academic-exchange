@@ -145,24 +145,14 @@ export default function BrowsePage() {
                                 />
                             </div>
 
-                            {/* University Filter */}
-                            <select
+                            {/* University Filter - Removed for single uni pivot */}
+                            {/* <select
                                 value={filters.university || ''}
                                 onChange={(e) => setFilters({ ...filters, university: e.target.value || undefined })}
-                                className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 appearance-none cursor-pointer"
-                                style={{
-                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23334155' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
-                                    backgroundPosition: 'right 0.5rem center',
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundSize: '1.5em 1.5em',
-                                    paddingRight: '2.5rem'
-                                }}
+                                className="hidden" 
                             >
                                 <option value="">{isRTL ? 'جميع الجامعات' : 'All Universities'}</option>
-                                {UNIVERSITIES.map((uni) => (
-                                    <option key={uni.id} value={uni.id}>{uni.name}</option>
-                                ))}
-                            </select>
+                            </select> */}
 
                             {/* Type Filter */}
                             <select
@@ -250,8 +240,8 @@ export default function BrowsePage() {
                                                         }}
                                                         disabled={savingResourceId === resource.id}
                                                         className={`p-1.5 rounded-lg transition-all ${savedResourceIds.includes(resource.id)
-                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                                : 'text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                            : 'text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
                                                             } ${savingResourceId === resource.id ? 'opacity-50' : ''}`}
                                                         title={savedResourceIds.includes(resource.id) ? (isRTL ? 'إزالة من المحفوظات' : 'Remove from saved') : (isRTL ? 'حفظ لاحقاً' : 'Save for later')}
                                                     >

@@ -40,7 +40,7 @@ export default function SignUpPage() {
             // FAMILY TESTING MODE: Redirect immediately to browse instead of showing verification message
             router.push('/browse');
         } catch (error: any) {
-            if (error.message === 'Please use your university email') {
+            if (error.message.includes('UTAS email')) {
                 setError(t('auth.signUp.errors.invalidEmail'));
             } else if (error.code === 'auth/email-already-in-use') {
                 setError(t('auth.signUp.errors.emailInUse'));

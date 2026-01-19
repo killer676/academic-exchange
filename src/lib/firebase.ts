@@ -20,18 +20,10 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 
 // List of valid Oman university email domains
+// List of valid Oman university email domains
 const VALID_EDU_DOMAINS = [
-    '@squ.edu.om',           // Sultan Qaboos University
-    '@gutech.edu.om',        // German University of Technology
-    '@utas.edu.om',          // University of Technology and Applied Sciences
-    '@nu.edu.om',            // Nizwa University
-    '@dhofar.edu.om',        // Dhofar University
-    '@uob.edu.om',           // University of Buraimi
-    '@soharuni.edu.om',      // Sohar University
-    '@mec.edu.om',           // Middle East College
-    '@cce.edu.om',           // Caledonian College of Engineering
-    '@gulfcollege.edu.om',   // Gulf College
-    '@mcbs.edu.om',          // Modern College of Business and Science
+    '@utas.edu.om',
+    '@student.utas.edu.om',
 ];
 
 // Email domain validation for Omani educational institutions

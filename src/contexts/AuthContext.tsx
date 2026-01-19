@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '',
                         photoURL: firebaseUser.photoURL,
                         phoneNumber: firebaseUser.phoneNumber,
-                        university: '',
+                        university: 'utas', // Auto-assign UTAS
                         isVerifiedStudent: isValidEduEmail(firebaseUser.email || ''),
                         createdAt: new Date(),
                     };
@@ -83,10 +83,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const signUp = async (email: string, password: string) => {
         try {
-            // FAMILY TESTING MODE: Disabled university email validation
-            // if (!isValidEduEmail(email)) {
-            //     throw new Error('Please use your university email');
-            // }
+            // Validate university email (Strict UTAS validation)
+            if (!isValidEduEmail(email)) {
+                throw new Error('Please use your UTAS email (@utas.edu.om)');
+            }
 
             // Create account
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);

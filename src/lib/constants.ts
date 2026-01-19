@@ -11,20 +11,7 @@ export const RESOURCE_TYPES = [
 
 // Universities in Oman
 export const UNIVERSITIES = [
-    { id: 'squ', name: 'Sultan Qaboos University', domain: 'squ.edu.om' },
-    { id: 'gutech', name: 'German University of Technology', domain: 'gutech.edu.om' },
     { id: 'utas', name: 'University of Technology and Applied Sciences', domain: 'utas.edu.om' },
-    { id: 'unizwa', name: 'University of Nizwa', domain: 'unizwa.edu.om' },
-    { id: 'du', name: 'Dhofar University', domain: 'du.edu.om' },
-    { id: 'su', name: 'Sohar University', domain: 'su.edu.om' },
-    { id: 'aou', name: 'Arab Open University', domain: 'aou.edu.om' },
-    { id: 'mec', name: 'Middle East College', domain: 'mec.edu.om' },
-    { id: 'mcbs', name: 'Modern College of Business and Science', domain: 'mcbs.edu.om' },
-    { id: 'gcc', name: 'Gulf College', domain: 'gulfcollege.edu.om' },
-    { id: 'ou', name: 'Oman College of Management & Technology', domain: 'ocmt.edu.om' },
-    { id: 'buc', name: 'Bayan College', domain: 'bayancollege.edu.om' },
-    { id: 'mu', name: 'Muscat University', domain: 'muscatuniversity.edu.om' },
-    { id: 'nct', name: 'National College of Technology', domain: 'nct.edu.om' },
 ];
 
 // Majors/Departments
